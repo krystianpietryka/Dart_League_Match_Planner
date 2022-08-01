@@ -1,8 +1,15 @@
 from itertools import combinations
-from teams_combination import teams
 import copy
 import random
 import PySimpleGUI as sg
+
+
+#find out an algorhitm to judge if given parameters are even possible
+
+
+def Create_Teams_Combinations(amount_of_players, amount_of_players_per_match):
+    numbers = [num for num in range(0, amount_of_players)]
+    return list(combinations(numbers, amount_of_players_per_match))
 
 
 def Create_Pairs(amount_of_players):
@@ -11,8 +18,8 @@ def Create_Pairs(amount_of_players):
     pairs = []
 
     #cartesian product of numbers
-    for i in range(10):
-        for j in range(10):
+    for i in numbers:
+        for j in numbers:
             pairs_temp.append((numbers[i], numbers[j]))
 
     #exclude duplicates and reverse duplicates
@@ -24,14 +31,13 @@ def Create_Pairs(amount_of_players):
 
 #   Loop over every team, add the combination of pairs to temp pair count,
 #   if any pair combination makes the count > 2, dont add this team
-def Create_Matches(pairs, amount_of_players, amount_of_pair_matches, amount_of_players_per_match):
+def Create_Matches(teams, pairs, amount_of_players, amount_of_pair_matches, amount_of_players_per_match):
 
     matches = []
 
     pairs_count = {}
     for pair in pairs:
             pairs_count[pair] = 0
-
     for team in teams:
         good_flag = 1
 
@@ -84,7 +90,7 @@ def Numbers_To_Letters(matches):
 
 
 
-def Create_Match_Table(pairs, amount_of_players, amount_of_pair_matches, amount_of_players_per_match):
+def Create_Match_Table(teams, pairs, amount_of_players, amount_of_pair_matches, amount_of_players_per_match):
     #shuffles teams configuration randomly until the process returns valid matches
     matches_valid_flag = 0
     counter = 0
@@ -93,16 +99,15 @@ def Create_Match_Table(pairs, amount_of_players, amount_of_pair_matches, amount_
     while matches_valid_flag != 1:
 
         counter+=1
-        print('\n', counter, '\n')
-
+        print('\n Counter: ', counter, '\n')
         random.shuffle(teams)
 
-        matches = Create_Matches(pairs, amount_of_players, amount_of_pair_matches, amount_of_players_per_match)
+        matches = Create_Matches(teams, pairs, amount_of_players, amount_of_pair_matches, amount_of_players_per_match)
 
         #print(matches)
 
         matches_valid_flag = Validity_Check(matches, pairs, amount_of_pair_matches)
-
+        #print(already_used_team_combinations)
     return Numbers_To_Letters(matches)
 
 #UI
@@ -135,6 +140,7 @@ def Created_Matches_Layout():
 
 
 def main():
+    
     window1, window2 = Intro(), None
     while True:
         window, event, values = sg.read_all_windows()
@@ -147,9 +153,11 @@ def main():
         # Handling events
         if event == 'Run' and not window2:
             pairs = Create_Pairs(int(values["amount_of_players"]))
-            result = Create_Match_Table(pairs, int(values["amount_of_players"]) ,  int(values["amount_of_pair_matches"]), int(values["amount_of_players_per_match"]))
+            teams = Create_Teams_Combinations(int(values["amount_of_players"]), int(values["amount_of_players_per_match"]))
+            result = Create_Match_Table(teams, pairs, int(values["amount_of_players"]) ,  int(values["amount_of_pair_matches"]), int(values["amount_of_players_per_match"]))
             window2 = Created_Matches_Layout()
             window2["-OUTPUT-"].update(result)
+            print(result)
 
 
 if __name__ == "__main__":
