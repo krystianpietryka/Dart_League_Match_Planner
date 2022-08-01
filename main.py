@@ -111,7 +111,7 @@ def Intro():
     [sg.Text('Choose parameters and run. This can take a while.', size=(40, 1))],
     [sg.Text('Amount of Players:', size=(35, 1)), sg.Input(key='amount_of_players', enable_events=True)],
     [sg.Text('Matches between player pair:', size=(35, 1)), sg.Input(key='amount_of_pair_matches', enable_events=True)],
-    sg.Button('Run'), sg.Button('Exit')]
+    [sg.Button('Run'), sg.Button('Exit')]]
     return sg.Window("Dart_League", layout, finalize=True)
 
 
