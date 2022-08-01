@@ -2,6 +2,7 @@ from itertools import combinations
 from teams_combination import teams
 import copy
 import random
+import PySimpleGUI as sg
 
 
 def Create_Pairs():
@@ -83,29 +84,75 @@ def Numbers_To_Letters(matches):
 
 
 
-
-#shuffles teams configuration randomly until the process returns valid matches
-matches_valid_flag = 0
-counter = 0
-
-pairs = Create_Pairs()
-
-while matches_valid_flag != 1:
-
-    counter+=1
-    print('\n', counter, '\n')
-
-    random.shuffle(teams)
-
-    matches = Create_Matches()
-
-    #print(matches)
-
-    matches_valid_flag = Validity_Check(matches)
-
-print(Numbers_To_Letters(matches))
+def Create_Match_Table():
+    #shuffles teams configuration randomly until the process returns valid matches
+    matches_valid_flag = 0
+    counter = 0
 
 
+    while matches_valid_flag != 1:
+
+        counter+=1
+        print('\n', counter, '\n')
+
+        random.shuffle(teams)
+
+        matches = Create_Matches()
+
+        #print(matches)
+
+        matches_valid_flag = Validity_Check(matches)
+
+    print(Numbers_To_Letters(matches))
+
+#UI
+def Intro():
+    layout = [[sg.Text('Welcome to Dart League Match Planner!', size=(40, 1))], 
+    [sg.Text('Choose parameters and run. This can take a while.', size=(40, 1))],
+    [sg.Text('Amount of Players:', size=(35, 1)), sg.Input(key='amount_of_players', enable_events=True)],
+    [sg.Text('Matches between player pair:', size=(35, 1)), sg.Input(key='amount_of_pair_matches', enable_events=True)],
+    sg.Button('Run'), sg.Button('Exit')]
+    return sg.Window("Dart_League", layout, finalize=True)
+
+
+def Created_Matches_Layout():
+    col = [[sg.Text(k="-OUTPUT-", size=(20, 50))]]
+    layout = [
+        [
+            sg.Column(
+                col,
+                size=(150, 600),
+                expand_x=True,
+                vertical_scroll_only=True,
+                justification="center",
+                element_justification="center",
+                scrollable=True,
+            )
+        ]
+    ]
+    return sg.Window("Matches", layout, location=(550, 0), finalize=True)
+
+
+def main():
+    window1, window2 = Intro(), None
+    pairs = Create_Pairs()
+    while True:
+        window, event, values = sg.read_all_windows()
+        if event == sg.WIN_CLOSED or event == 'Exit':
+            window.close()
+            if window == window2:  # if closing win 2, mark as closed
+                window2 = None
+            elif window == window1:  # if closing win 1, exit program
+                break
+        # Handling events
+        if event == 'Run' and not window2:
+            result = Create_Match_Table()
+            window2 = Created_Matches_Layout
+            window2["-OUTPUT-"].update(result)
+
+
+if __name__ == "__main__":
+    main()
 
 
 
