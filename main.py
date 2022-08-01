@@ -5,8 +5,8 @@ import random
 import PySimpleGUI as sg
 
 
-def Create_Pairs():
-    numbers = [0,1,2,3,4,5,6,7,8,9]
+def Create_Pairs(amount_of_players):
+    numbers = [num for num in range(0, amount_of_players)]
     pairs_temp = []
     pairs = []
 
@@ -24,7 +24,7 @@ def Create_Pairs():
 
 #   Loop over every team, add the combination of pairs to temp pair count,
 #   if any pair combination makes the count > 2, dont add this team
-def Create_Matches():
+def Create_Matches(pairs, amount_of_players, amount_of_pair_matches, amount_of_players_per_match):
 
     matches = []
 
@@ -39,7 +39,7 @@ def Create_Matches():
         list_combinations = list(combinations(team, 2))
 
         for combination in list_combinations:
-            if temp_pairs_count[combination] < 2:
+            if temp_pairs_count[combination] < amount_of_pair_matches:
                 temp_pairs_count[combination] += 1
             else:
                 good_flag = 0
@@ -50,7 +50,7 @@ def Create_Matches():
     return matches
   
 #checks if pairs count of returned matches configuration is valid (count = 2)
-def Validity_Check(matches):
+def Validity_Check(matches, pairs, amount_of_pair_matches):
     pairs_count = {}
     valid_flag = 1
 
@@ -65,7 +65,7 @@ def Validity_Check(matches):
     print(pairs_count)
 
     for value in pairs_count.values():
-        if value != 2:
+        if value != amount_of_pair_matches:
             valid_flag = 0
             break
     return valid_flag
@@ -84,7 +84,7 @@ def Numbers_To_Letters(matches):
 
 
 
-def Create_Match_Table():
+def Create_Match_Table(pairs, amount_of_players, amount_of_pair_matches, amount_of_players_per_match):
     #shuffles teams configuration randomly until the process returns valid matches
     matches_valid_flag = 0
     counter = 0
@@ -97,13 +97,13 @@ def Create_Match_Table():
 
         random.shuffle(teams)
 
-        matches = Create_Matches()
+        matches = Create_Matches(pairs, amount_of_players, amount_of_pair_matches, amount_of_players_per_match)
 
         #print(matches)
 
-        matches_valid_flag = Validity_Check(matches)
+        matches_valid_flag = Validity_Check(matches, pairs, amount_of_pair_matches)
 
-    print(Numbers_To_Letters(matches))
+    return Numbers_To_Letters(matches)
 
 #UI
 def Intro():
@@ -111,6 +111,7 @@ def Intro():
     [sg.Text('Choose parameters and run. This can take a while.', size=(40, 1))],
     [sg.Text('Amount of Players:', size=(35, 1)), sg.Input(key='amount_of_players', enable_events=True)],
     [sg.Text('Matches between player pair:', size=(35, 1)), sg.Input(key='amount_of_pair_matches', enable_events=True)],
+    [sg.Text('Players in a match:', size=(35, 1)), sg.Input(key='amount_of_players_per_match', enable_events=True)],
     [sg.Button('Run'), sg.Button('Exit')]]
     return sg.Window("Dart_League", layout, finalize=True)
 
@@ -135,7 +136,6 @@ def Created_Matches_Layout():
 
 def main():
     window1, window2 = Intro(), None
-    pairs = Create_Pairs()
     while True:
         window, event, values = sg.read_all_windows()
         if event == sg.WIN_CLOSED or event == 'Exit':
@@ -146,8 +146,9 @@ def main():
                 break
         # Handling events
         if event == 'Run' and not window2:
-            result = Create_Match_Table()
-            window2 = Created_Matches_Layout
+            pairs = Create_Pairs(int(values["amount_of_players"]))
+            result = Create_Match_Table(pairs, int(values["amount_of_players"]) ,  int(values["amount_of_pair_matches"]), int(values["amount_of_players_per_match"]))
+            window2 = Created_Matches_Layout()
             window2["-OUTPUT-"].update(result)
 
 
