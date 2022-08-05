@@ -1,9 +1,9 @@
 import random
 
 #input here
-players = ['Krystian', 'Bart']
-letters = ['A','B']
-matches = [['A','B']]
+players = []
+letters = []
+matches = []
 
 player_assignment = {}
 for letter in letters:
