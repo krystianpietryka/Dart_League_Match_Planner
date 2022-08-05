@@ -1,9 +1,9 @@
 import random
 
 #input here
-players = []
-letters = []
-matches = []
+players = ['Krystian', 'Bart']
+letters = ['A','B']
+matches = [['A','B']]
 
 player_assignment = {}
 for letter in letters:
@@ -20,7 +20,13 @@ for match in matches:
         new_match.append(player_assignment[letter])
     matches_changed.append(new_match)
 
-print('\n', 'Player Assignment :', '\n', player_assignment, '\n')
+print('\n', 'Player Assignment :', '\n')
+for letter in player_assignment:
+    print(letter, ':', player_assignment[letter])
 
+counter = 0
+print('\n')
 for match in matches_changed:
-    print(match)
+    counter += 1
+    print(counter, ' '.join(match))
+print('\n')
